@@ -1,4 +1,4 @@
-package sfs
+package libfs
 
 import (
 	"bufio"
