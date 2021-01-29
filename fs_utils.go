@@ -3,7 +3,7 @@ package libfs
 import (
 	"errors"
 	"fmt"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -66,10 +66,10 @@ func (fi *fileInfo) getDataDirForVer(verID uint) (string, error) {
 	}
 
 	if verID == FileIDV1 {
-		return path.Join(fi.fileMD5[0:4], fi.fileMD5[4:8], fi.fileMD5[8:12], fi.fileMD5[12:16],
+		return filepath.Join(fi.fileMD5[0:4], fi.fileMD5[4:8], fi.fileMD5[8:12], fi.fileMD5[12:16],
 			fi.fileMD5[16:20], fi.fileMD5[20:24], fi.fileMD5[24:28], fi.fileMD5[28:32]), nil
 	} else if verID == FileIDV2 {
-		return path.Join(fmt.Sprintf("%v", fi.fileSize), fi.fileMD5[0:4], fi.fileMD5[4:8], fi.fileMD5[8:12], fi.fileMD5[12:16],
+		return filepath.Join(fmt.Sprintf("%v", fi.fileSize), fi.fileMD5[0:4], fi.fileMD5[4:8], fi.fileMD5[8:12], fi.fileMD5[12:16],
 			fi.fileMD5[16:20], fi.fileMD5[20:24], fi.fileMD5[24:28], fi.fileMD5[28:32]), nil
 	}
 
@@ -90,9 +90,9 @@ func (fi *fileInfo) getDataFileForVer(verID uint) (string, error) {
 		return "", err
 	}
 	if verID == FileIDV1 {
-		return path.Join(rDataDir, fmt.Sprintf("%v", fi.fileSize)), nil
+		return filepath.Join(rDataDir, fmt.Sprintf("%v", fi.fileSize)), nil
 	} else if verID == FileIDV2 {
-		return path.Join(rDataDir, BuildInDataName), nil
+		return filepath.Join(rDataDir, BuildInDataName), nil
 	}
 
 	return "", errorInvalidFileID
@@ -146,9 +146,9 @@ func (fi *fileInfo) getNameFileForVer(verID uint) (string, error) {
 		} else {
 			fileField = BuiltInFileName
 		}
-		return path.Join(rDataDir, fileField), nil
+		return filepath.Join(rDataDir, fileField), nil
 	} else if verID == FileIDV2 {
-		return path.Join(rDataDir, fi.fileName), nil
+		return filepath.Join(rDataDir, fi.fileName), nil
 	}
 
 	return "", errorInvalidFileID

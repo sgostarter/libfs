@@ -4,16 +4,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/jiuzhou-zhao/go-fundamental/pathutils"
 )
 
+const (
+	Separators = string(filepath.Separator)
+)
+
 // IsSizeExistsInStorage function
 func IsSizeExistsInStorage(fileSize uint64, rootPath string) (bool, error) {
-	return pathutils.IsDirExists(path.Join(rootPath, rPathV2, fmt.Sprintf("%v", fileSize)))
+	return pathutils.IsDirExists(filepath.Join(rootPath, rPathV2, fmt.Sprintf("%v", fileSize)))
 }
 
 // IsSizeMD5ExistsInStorage function
@@ -28,12 +32,14 @@ func IsSizeMD5ExistsInStorage(fileSize uint64, md5 string, rootPath string) (boo
 func parseFileIDFromFilePath(filePath string, version uint) (error, string) {
 	if version == FileIDV1 {
 		// 5a8dd3ad0756a93ded72b823b19dd877-6.test
-		key := "/" + rPathV1 + "/"
+		filepath.Join()
+		key := Separators + rPathV1 + Separators
 		idx := strings.Index(filePath, key)
+
 		if idx == -1 {
 			return fmt.Errorf("unsupported %v", filePath), ""
 		}
-		pathIDs := strings.Split(filePath[idx+len(key):], "/")
+		pathIDs := strings.Split(filePath[idx+len(key):], Separators)
 		if len(pathIDs) != 9 {
 			return fmt.Errorf("unsupported %v", filePath), ""
 		}
@@ -53,12 +59,12 @@ func parseFileIDFromFilePath(filePath string, version uint) (error, string) {
 	if version == FileIDV2 {
 		// */V2/size/md1/.../__date__
 		// v2-6-5a8dd3ad0756a93ded72b823b19dd877-ab.test
-		key := "/" + rPathV2 + "/"
+		key := Separators + rPathV2 + Separators
 		idx := strings.Index(filePath, key)
 		if idx == -1 {
 			return fmt.Errorf("unsupported %v", filePath), ""
 		}
-		pathIDs := strings.Split(filePath[idx+len(key):], "/")
+		pathIDs := strings.Split(filePath[idx+len(key):], Separators)
 		if len(pathIDs) != 10 {
 			return fmt.Errorf("unsupported %v", filePath), ""
 		}
@@ -141,7 +147,7 @@ func getFileList(parentPath string, version uint, findNext bool, ids []string, c
 
 	var newFiles []string
 	utilWalk(0, len(fis)-1, findNext, func(idx int) bool {
-		curPath := path.Join(parentPath, fis[idx].Name())
+		curPath := filepath.Join(parentPath, fis[idx].Name())
 		if !fis[idx].IsDir() {
 			if len(ids) > 0 {
 				// 哨兵作用在这里
@@ -220,14 +226,14 @@ func GetFileList(lastFileID, rootPath string, findNext bool, count int) (err err
 
 	var filesBatch []string
 	if ver == FileIDV1 {
-		err, filesBatch = getFileList(path.Join(rootPath, rPathV1), ver, findNext, ids, count)
+		err, filesBatch = getFileList(filepath.Join(rootPath, rPathV1), ver, findNext, ids, count)
 		files = append(files, filesBatch...)
 		count -= len(filesBatch)
 		ids = make([]string, 0)
 		ver = FileIDV2
 	}
 	if ver == FileIDV2 {
-		err, filesBatch = getFileList(path.Join(rootPath, rPathV2), ver, findNext, ids, count)
+		err, filesBatch = getFileList(filepath.Join(rootPath, rPathV2), ver, findNext, ids, count)
 		files = append(files, filesBatch...)
 	}
 

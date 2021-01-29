@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/jiuzhou-zhao/go-fundamental/pathutils"
@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestV1l(t *testing.T) {
-	tempFile := path.Join(tempPath, "test.txt")
+	tempFile := filepath.Join(tempPath, "test.txt")
 	err := ioutil.WriteFile(tempFile, []byte("hello!!"), 0644)
 	assert.Nil(t, err)
 
@@ -68,7 +68,7 @@ func TestV1l(t *testing.T) {
 }
 
 func TestV2l(t *testing.T) {
-	tempFile := path.Join(tempPath, "test.txt")
+	tempFile := filepath.Join(tempPath, "test.txt")
 	err := ioutil.WriteFile(tempFile, []byte("hello!"), 0644)
 	assert.Nil(t, err)
 
