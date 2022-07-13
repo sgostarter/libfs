@@ -17,6 +17,7 @@ const (
 	tempPath     = "./teststg/testtemp"
 )
 
+// nolint
 func TestMain(m *testing.M) {
 	_ = pathutils.RemoveAll(testRootPath)
 	_ = pathutils.MustDirExists(rootPath)
@@ -26,6 +27,7 @@ func TestMain(m *testing.M) {
 	os.Exit(ret)
 }
 
+// nolint
 func TestV1l(t *testing.T) {
 	tempFile := filepath.Join(tempPath, "test.txt")
 	err := ioutil.WriteFile(tempFile, []byte("hello!!"), 0644)
@@ -67,6 +69,7 @@ func TestV1l(t *testing.T) {
 	fmt.Println(nf)
 }
 
+// nolint
 func TestV2l(t *testing.T) {
 	tempFile := filepath.Join(tempPath, "test.txt")
 	err := ioutil.WriteFile(tempFile, []byte("hello!"), 0644)

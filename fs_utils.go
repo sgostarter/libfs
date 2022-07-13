@@ -10,8 +10,8 @@ import (
 
 var errorInvalidFileID = errors.New("invalid file id")
 var errorUnknownFileID = errors.New("unknown file id")
-var errorHasInitialized = errors.New("has intialized")
-var errorNeedInitialized = errors.New("need intialized")
+var errorHasInitialized = errors.New("has initialized")
+var errorNeedInitialized = errors.New("need initialized")
 
 const (
 	// FileIDV1 version of file id
@@ -40,8 +40,10 @@ func (fi *fileInfo) initFileInfos(fileMD5 string, fileSize uint64) error {
 	if fi.fileMD5 != "" {
 		return errorHasInitialized
 	}
+
 	fi.fileMD5 = fileMD5
 	fi.fileSize = fileSize
+
 	return nil
 }
 
@@ -49,14 +51,18 @@ func (fi *fileInfo) getDataDir() (string, error) {
 	if fi.fileMD5 == "" {
 		return "", errorNeedInitialized
 	}
+
 	if fi.rDataDir != "" {
 		return fi.rDataDir, nil
 	}
+
 	rDataFullPath, err := fi.getDataDirForVer(fi.fileIDVersion)
 	if err != nil {
 		return "", err
 	}
+
 	fi.rDataDir = rDataFullPath
+
 	return fi.rDataDir, nil
 }
 
@@ -89,6 +95,7 @@ func (fi *fileInfo) getDataFileForVer(verID uint) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	if verID == FileIDV1 {
 		return filepath.Join(rDataDir, fmt.Sprintf("%v", fi.fileSize)), nil
 	} else if verID == FileIDV2 {
@@ -109,6 +116,7 @@ func (fi *fileInfo) getFileIDByVer(verID uint) (string, error) {
 
 	if verID == FileIDV1 {
 		fullDirName := fmt.Sprintf("%v-%v", fi.fileMD5, fi.fileSize)
+
 		if fi.fileName != "" {
 			dotIndex := strings.LastIndex(fi.fileName, ".")
 			if dotIndex != -1 {
@@ -117,6 +125,7 @@ func (fi *fileInfo) getFileIDByVer(verID uint) (string, error) {
 				fullDirName += BuiltInFileName
 			}
 		}
+
 		return fullDirName, nil
 	} else if verID == FileIDV2 {
 		return fmt.Sprintf("v2-%v-%v-%v", fi.fileSize, fi.fileMD5, fi.fileName), nil
@@ -138,14 +147,17 @@ func (fi *fileInfo) getNameFileForVer(verID uint) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	if verID == FileIDV1 {
 		var fileField string
+
 		dotIndex := strings.LastIndex(fi.fileName, ".")
 		if dotIndex != -1 {
 			fileField = fi.fileName[dotIndex:]
 		} else {
 			fileField = BuiltInFileName
 		}
+
 		return filepath.Join(rDataDir, fileField), nil
 	} else if verID == FileIDV2 {
 		return filepath.Join(rDataDir, fi.fileName), nil
@@ -154,6 +166,7 @@ func (fi *fileInfo) getNameFileForVer(verID uint) (string, error) {
 	return "", errorInvalidFileID
 }
 
+// nolint: unparam
 func newFileInfoWithVer(fileName string, ver uint) (*fileInfo, error) {
 	return &fileInfo{
 		fileIDVersion: ver,
@@ -170,6 +183,7 @@ func newFileInfoFromRawInfoWithVersion(ver uint, fileMd5 string, fileSize uint64
 	if len(fileMd5) != 32 {
 		return nil, errorInvalidFileID
 	}
+
 	return &fileInfo{
 		fileIDVersion: ver,
 		fileMD5:       fileMd5,
@@ -180,7 +194,9 @@ func newFileInfoFromRawInfoWithVersion(ver uint, fileMd5 string, fileSize uint64
 
 func newFileInfoFromFileID(fileID string) (*fileInfo, error) {
 	fileID = strings.Trim(fileID, " \t\r\n")
+
 	var finfo fileInfo
+
 	if strings.Index(fileID, "v") == 0 {
 		if strings.Index(fileID, "v2-") == 0 {
 			finfo.fileIDVersion = FileIDV2
@@ -191,14 +207,17 @@ func newFileInfoFromFileID(fileID string) (*fileInfo, error) {
 		if len(fileID) <= 34 || fileID[32] != '-' {
 			return nil, errorInvalidFileID
 		}
+
 		finfo.fileIDVersion = FileIDV1
 	}
 
 	if finfo.fileIDVersion == FileIDV1 {
 		finfo.fileMD5 = fileID[0:32]
+
 		if fileID[32:33] != "-" {
 			return nil, errorInvalidFileID
 		}
+
 		dotIdx := strings.Index(fileID, ".")
 
 		var fileSizeStr string
@@ -214,16 +233,19 @@ func newFileInfoFromFileID(fileID string) (*fileInfo, error) {
 		if err != nil {
 			return nil, errorInvalidFileID
 		}
+
 		finfo.fileSize = fileSize
 	} else if finfo.fileIDVersion == FileIDV2 {
 		parts := strings.SplitN(fileID, "-", 4)
 		if len(parts) != 4 {
 			return nil, errorInvalidFileID
 		}
+
 		fsize, err := strconv.ParseUint(parts[1], 10, 64)
 		if err != nil {
 			return nil, err
 		}
+
 		finfo.fileSize = fsize
 		finfo.fileMD5 = parts[2]
 		finfo.fileName = parts[3]

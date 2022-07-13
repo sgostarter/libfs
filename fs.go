@@ -40,6 +40,7 @@ func NewSFSItemByInfo(fileMd5 string, fileSize uint64, fileName string, rootPath
 	if err != nil {
 		return nil, err
 	}
+
 	return &Item{
 		rootPath: rootPath,
 		tempPath: tempPath,
@@ -58,6 +59,7 @@ func NewSFSItemWithVer(ver uint, ext, rootPath, tempPath string) (*Item, error) 
 	if err != nil {
 		return nil, err
 	}
+
 	return &Item{
 		rootPath: rootPath,
 		tempPath: tempPath,
@@ -71,6 +73,7 @@ func NewSFSItemFromFileID(fileID string, rootPath string, tempPath string) (*Ite
 	if err != nil {
 		return nil, err
 	}
+
 	return &Item{
 		rootPath: rootPath,
 		tempPath: tempPath,
@@ -89,7 +92,9 @@ func (item *Item) versionRootPathForVer(verID uint) string {
 	case FileIDV2:
 		return filepath.Join(item.rootPath, rPathV2)
 	}
+
 	log.Fatalf("invalid fileIDVersion: %+v", item)
+
 	return ""
 }
 
@@ -97,37 +102,43 @@ func (item *Item) versionRootPathForVer(verID uint) string {
 func (item *Item) ExistsInStorage() (dataExists, fileExists bool, err error) {
 	rDataPath, err := item.fileInfo.getDataFile()
 	if err != nil {
-		return false, false, err
+		return
 	}
+
 	dataExists, err = pathutils.IsFileExists(filepath.Join(item.versionRootPath(), rDataPath))
 	if err != nil {
 		return
 	}
+
 	rFilePath, err := item.fileInfo.getNameFile()
 	if err != nil {
-		return false, false, err
+		return
 	}
+
 	fileExists, err = pathutils.IsFileExists(filepath.Join(item.versionRootPath(), rFilePath))
+
 	return
 }
 
 // ExistsDataInAllStorage method
-func (item *Item) ExistsDataInAllStorage() (dataExists bool, err error) {
+func (item *Item) ExistsDataInAllStorage() (dataExists bool, _ error) {
 	for ver := FileIDV1; ver <= FileIDVMAX; ver++ {
 		rDataPath, err := item.fileInfo.getDataFileForVer(uint(ver))
 		if err != nil {
 			continue
 		}
+
 		dataExists, err = pathutils.IsFileExists(filepath.Join(item.versionRootPathForVer(uint(ver)), rDataPath))
 		if err != nil {
 			continue
 		}
+
 		if dataExists {
-			return true, nil
+			return
 		}
 	}
-	return false, nil
 
+	return
 }
 
 // GetDataFile method
@@ -136,16 +147,18 @@ func (item *Item) GetDataFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return filepath.Join(item.versionRootPath(), rDataPath), nil
 }
 
 // GetNameFile method
 func (item *Item) GetNameFile() (string, error) {
-	rDataPath, err := item.fileInfo.getNameFile()
+	rFilePath, err := item.fileInfo.getNameFile()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(item.versionRootPath(), rDataPath), nil
+
+	return filepath.Join(item.versionRootPath(), rFilePath), nil
 }
 
 // GetFileID method
@@ -159,6 +172,7 @@ func (item *Item) WriteFileRecord() error {
 	if err != nil {
 		return err
 	}
+
 	return ioutil.WriteFile(filepath.Join(item.versionRootPath(), rFilePath), []byte(""), 0666)
 }
 
@@ -171,13 +185,17 @@ func (item *Item) WriteFile(reader io.Reader) error {
 
 	fileName := filepath.Join(item.tempPath, u1.String())
 	file, err := os.Create(fileName)
+
 	if err != nil {
 		return err
 	}
+
 	defer func() {
 		_ = file.Close()
 	}()
+
 	fileWriter := bufio.NewWriter(file)
+
 	defer func() {
 		_ = fileWriter.Flush()
 	}()
@@ -200,8 +218,10 @@ func (item *Item) WriteFile(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
+
 	dataFile := filepath.Join(item.versionRootPath(), rDataFile)
 	err = pathutils.MustDirOfFileExists(dataFile)
+
 	if err != nil {
 		return err
 	}

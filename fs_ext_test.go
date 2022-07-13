@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// nolint
 func TestGetFileList(t *testing.T) {
 	TestV1l(t)
 	TestV2l(t)
