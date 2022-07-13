@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jiuzhou-zhao/go-fundamental/pathutils"
+	"github.com/sgostarter/libeasygo/pathutils"
 )
 
 const (

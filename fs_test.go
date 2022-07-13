@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jiuzhou-zhao/go-fundamental/pathutils"
+	"github.com/sgostarter/libeasygo/pathutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,8 +19,8 @@ const (
 
 func TestMain(m *testing.M) {
 	_ = pathutils.RemoveAll(testRootPath)
-	_ = pathutils.MakesureDirExists(rootPath)
-	_ = pathutils.MakesureDirExists(tempPath)
+	_ = pathutils.MustDirExists(rootPath)
+	_ = pathutils.MustDirExists(tempPath)
 	ret := m.Run()
 	_ = pathutils.RemoveAll(testRootPath)
 	os.Exit(ret)

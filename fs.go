@@ -10,8 +10,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jiuzhou-zhao/go-fundamental/pathutils"
 	"github.com/satori/go.uuid"
+	"github.com/sgostarter/libeasygo/pathutils"
 )
 
 /*
@@ -201,7 +201,7 @@ func (item *Item) WriteFile(reader io.Reader) error {
 		return err
 	}
 	dataFile := filepath.Join(item.versionRootPath(), rDataFile)
-	err = pathutils.MakesureDirOfFileExists(dataFile)
+	err = pathutils.MustDirOfFileExists(dataFile)
 	if err != nil {
 		return err
 	}
